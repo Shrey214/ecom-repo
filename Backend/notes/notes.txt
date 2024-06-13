@@ -1,0 +1,3 @@
+npm init -y : package.json
+npm i -g typescript :- globally install typescript
+tsc --init :- tsconfig.json file
