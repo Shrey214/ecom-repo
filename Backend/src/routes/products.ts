@@ -4,6 +4,7 @@ import {
   deleteProduct,
   getAdminProducts,
   getAllCategories,
+  getAllFilteredProducts,
   getLatestProducts,
   getSingleProduct,
   newProduct,
@@ -16,6 +17,7 @@ app.post("/new", adminOnly, singleUpload, newProduct);
 app.get("/latest", getLatestProducts);
 app.get("/categories", getAllCategories);
 app.get("/admin-products", getAdminProducts);
+app.get("/all",getAllFilteredProducts);
 app
   .route("/:id")
   .get(getSingleProduct)
