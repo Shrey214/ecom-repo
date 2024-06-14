@@ -13,7 +13,7 @@ export const newUser = TryCatch(
     // throw new ErrorHandler("Some Error",402);
     // return next(new ErrorHandler("Meri Custom error",402));
     const { name, email, photo, gender, _id, dob } = req.body;
-
+    console.log(name, email, photo, gender, _id, dob);
     let user = await User.findById(_id);
     if (user) {
       return res.status(200).json({
