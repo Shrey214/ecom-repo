@@ -7,13 +7,16 @@ import paymentRoute from "./routes/payment.js";
 import { connectDB } from "./utils/features.js";
 import { errorMiddleware } from "./middlewares/error.js";
 import NodeCache from "node-cache";
-import {config} from "dotenv";
+import { config } from "dotenv";
 import morgan from "morgan";
+import Stripe from "stripe";
 config({
-  path:"./.env"
-})
+  path: "./.env",
+});
 const DB_URL = process.env.DB_URL || "";
+const stripeKey = process.env.STRIPE_KEY || "";
 connectDB(DB_URL);
+export const stripe = new Stripe(stripeKey);
 export const myCache = new NodeCache();
 const port = process.env.PORT || 3000;
 const app = express();

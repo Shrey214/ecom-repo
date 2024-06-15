@@ -1,7 +1,7 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 import { InvalidateCacheProps, OrderItemType } from "../types/types.js";
 import { Product } from "../models/product.js";
-import { Order } from "../models/order.js";
+// import { Order } from "../models/order.js";
 import { myCache } from "../app.js";
 export const connectDB = (uri: string) => {
   mongoose
@@ -12,7 +12,7 @@ export const connectDB = (uri: string) => {
     .catch((e) => console.log(`Error in connecting with DB`));
 };
 
-export const invalidateCache = async ({
+export const invalidateCache = ({
   product,
   order,
   admin,
@@ -47,6 +47,12 @@ export const invalidateCache = async ({
     myCache.del(orderKeys);
   }
   if (admin) {
+    myCache.del([
+      "admin-stats",
+      "admin-pie-charts",
+      "admin-bar-charts",
+      "admin-line-charts",
+    ]);
   }
 };
 
@@ -66,11 +72,11 @@ export const calculatePercentage = (
 ): number => {
   if (lastMonth === 0) return thisMonth * 100;
   console.log(thisMonth, lastMonth);
-  const percent = ((thisMonth - lastMonth) / lastMonth) * 100;
+  const percent = (thisMonth / lastMonth) * 100;
   return Number(percent.toFixed(0));
 };
 
-export const getInventories  = async ({
+export const getInventories = async ({
   categories,
   productsCount,
 }: {
@@ -89,4 +95,40 @@ export const getInventories  = async ({
     });
   });
   return categoryCount;
+};
+
+interface MyDocument extends Document {
+  createdAt: Date;
+  discount?: number;
+  total?: number;
+}
+type FuncProps = {
+  length: number;
+  docArr: MyDocument[];
+  today: Date;
+  property?: "discount" | "total";
+};
+
+export const getChartData = ({
+  length,
+  docArr,
+  today,
+  property,
+}: FuncProps) => {
+  const data: number[] = new Array(length).fill(0);
+
+  docArr.forEach((i) => {
+    const creationDate = i.createdAt;
+    const monthDiff = (today.getMonth() - creationDate.getMonth() + 12) % 12;
+
+    if (monthDiff < length) {
+      if (property) {
+        data[length - monthDiff - 1] += i[property]!;
+      } else {
+        data[length - monthDiff - 1] += 1;
+      }
+    }
+  });
+
+  return data;
 };
